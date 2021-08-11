@@ -1,0 +1,52 @@
+pass_Last_Fm=6nXB~dNSA3uZa<T
+
+last_api_key = a8e35717f897047c80a1b447e9438370
+
+
+
+user input artist and album
+uri = http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=a8e35717f897047c80a1b447e9438370&artist=Cher&album=Believe&format=json
+
+
+endpoint return list tracks this artist
+
+{
+    "name_artist":artist
+    "album":album
+    tracks : [{
+        "id:1
+        "name":"lol"
+        "uri":"http://wtf.com/track"
+    },
+    {
+        "id":2
+        "name" : "lol"
+        "uri" : "kjsdhaks"
+    }]
+}
+
+
+// func get_content() {
+// 	type TrackInfo struct {
+// 		Name string
+// 	}
+// 	type Track struct {
+// 		Track []TrackInfo
+// 	}
+// 	type Info struct {
+// 		Name   string
+// 		Tracks Track
+// 	}
+// 	type Album struct {
+// 		Album Info
+// 	}
+
+// 	byt := []byte(`{"album":{"name":"Dick", "tracks":{"track":[{"name":"some"},{"name":"love"}]}}}`)
+// 	var dat Album
+// 	if err := json.Unmarshal(byt, &dat); err != nil {
+// 		panic(err)
+// 	}
+// 	// fmt.Println(dat["album"].(map[string]interface{})["tracks"].(map[string]interface{})["track"].([]interface{})[0].(map[string]interface{})["name"])
+// 	// fmt.Println(dat["album"].(map[string]interface{})["tracks"].(map[string]interface{})["track"].([]interface{})[1].(map[string]interface{})["name"])
+// 	fmt.Println(dat.Album.Tracks.Track[0].Name)
+// }
