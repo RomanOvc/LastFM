@@ -8,7 +8,7 @@ import (
 	"net/url"
 )
 
-func Get_content(nameArtist, albumName string) string {
+func Get_content(nameArtist, albumName string) []byte {
 
 	nameArtistT := &url.URL{Path: nameArtist}
 	nameArtistTEncoder := nameArtistT.String()
@@ -47,5 +47,5 @@ func Get_content(nameArtist, albumName string) string {
 		panic(err)
 	}
 
-	return string(u)
+	return u
 }
