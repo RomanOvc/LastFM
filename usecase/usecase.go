@@ -39,7 +39,7 @@ func ArtistAlbum(body *[]byte) (*models.Result, error) {
 		return nil, errors.Wrap(err, "Error request")
 	}
 	var parsedData []models.AlbumTrack
-	for i := 0; i < len(data.Album.Tracks.Track); i++ {
+	for i := range data.Album.Tracks.Track {
 		parsedData = append(parsedData, models.AlbumTrack{Id: i + 1, URL: data.Album.Tracks.Track[i].Url, TrackName: data.Album.Tracks.Track[i].Name})
 	}
 	result := models.Result{AlbumName: string(data.Album.Name), AlbumArtist: data.Album.Artist, AlbumTrack: parsedData}

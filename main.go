@@ -7,30 +7,47 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/pkg/errors"
 )
 
 func trackByAlbumArtist(w http.ResponseWriter, r *http.Request) {
+
 	var (
+		u   []byte
 		err error
 	)
+	defer func() {
+		if err != nil {
+			log.Println(err, "Error request")
+			w.Write([]byte(err.Error()))
+		} else {
+			w.Write(u)
+		}
+	}()
 	w.Header().Set("Content-Type", "application/json")
 	artist := r.URL.Query().Get("artist")
 	album := r.URL.Query().Get("album")
-	res, err := usecase.GetBody(artist, album)
-	res1, err := usecase.ArtistAlbum(res)
-	u, err := json.Marshal(res1)
 
+	res, err := usecase.GetBody(artist, album)
 	if err != nil {
-		log.Println(errors.Wrap(err, "Error request"))
+		return
 	}
 
-	w.Write(u)
+	res1, err := usecase.ArtistAlbum(res)
+	if err != nil {
+		return
+	}
+
+	u, err = json.Marshal(res1)
+	if err != nil {
+		return
+	}
+
+	return
 }
 
 func lastfmApi() {
 	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/info", trackByAlbumArtist).Methods("POST")
+	router.HandleFunc("/info", trackByAlbumArtist).Methods("GET")
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
