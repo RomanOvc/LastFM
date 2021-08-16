@@ -5,47 +5,43 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"net/url"
+
+	"github.com/pkg/errors"
 )
 
-func Get_content(nameArtist, albumName string) []byte {
+var apiKey = "a8e35717f897047c80a1b447e9438370"
+var urlAlbumGetInfo = "http://ws.audioscrobbler.com/2.0/"
 
-	nameArtistT := &url.URL{Path: nameArtist}
-	nameArtistTEncoder := nameArtistT.String()
-	albumNameT := &url.URL{Path: albumName}
-	albumNameTEncoder := albumNameT.String()
-
-	url := "http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=a8e35717f897047c80a1b447e9438370&artist=" + nameArtistTEncoder + "&album=" + albumNameTEncoder + "&format=json"
-
-	res, err := http.Get(url)
-
-	if err != nil {
-		panic(err.Error())
-	}
-
+func GetBody(nameArtist, albumName string) (*[]byte, error) {
+	var (
+		err error
+	)
+	req, err := http.NewRequest(http.MethodGet, urlAlbumGetInfo, nil)
+	q := req.URL.Query()
+	q.Add("method", "album.getinfo")
+	q.Add("api_key", apiKey)
+	q.Add("artist", nameArtist)
+	q.Add("album", albumName)
+	q.Add("format", "json")
+	req.URL.RawQuery = q.Encode()
+	res, err := http.Get(req.URL.String())
 	body, err := ioutil.ReadAll(res.Body)
-
 	if err != nil {
-		panic(err.Error())
+		return nil, errors.Wrap(err, "Error request")
 	}
 
-	var data *models.AlbumU
+	return &body, nil
+}
 
-	if err := json.Unmarshal(body, &data); err != nil {
-		panic(err)
+func ArtistAlbum(body *[]byte) (*models.Result, error) {
+	var data models.AlbumU
+	if err := json.Unmarshal(*body, &data); err != nil {
+		return nil, errors.Wrap(err, "Error request")
 	}
-
 	var parsedData []models.AlbumTrack
 	for i := 0; i < len(data.Album.Tracks.Track); i++ {
 		parsedData = append(parsedData, models.AlbumTrack{Id: i + 1, URL: data.Album.Tracks.Track[i].Url, TrackName: data.Album.Tracks.Track[i].Name})
-
 	}
 	result := models.Result{AlbumName: string(data.Album.Name), AlbumArtist: data.Album.Artist, AlbumTrack: parsedData}
-	u, err := json.Marshal(result)
-
-	if err != nil {
-		panic(err)
-	}
-
-	return u
+	return &result, nil
 }
